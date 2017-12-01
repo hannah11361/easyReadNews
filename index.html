@@ -4,14 +4,18 @@
     <meta charset="utf-8">
 
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Angular Application</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <title>Easy Read</title>
 </head>
 <body>
 
-    <div ng-app="app">
-        <div ng-controller="MainController">
-            Hello, {{ name }}!
-        </div>
+    <div ng-app="myApp" ng-controller="MainController">
+        <p>    Hello, {{ name }}! </p>
+     
+        <a ng-repeat="topic in topics track by $index" href="{{ topic.link }}">{{topic.chnTopic}}<br></a>
+
+        <br>
+
     </div>
 
     <script src="js/angular.js"></script>
