@@ -1,24 +1,52 @@
 <!doctype html>
 <html>
 <head>
-    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
 
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
     <title>Easy Read</title>
 </head>
-<body>
+<body ng-app="myApp" ng-controller="MainController">
 
-    <div ng-app="myApp" ng-controller="MainController">
-        <p>    Hello, {{ name }}! </p>
-     
-        <a ng-repeat="topic in topics track by $index" href="{{ topic.link }}">{{topic.chnTopic}}<br></a>
+    <div ng-cloak layout-gt-sm="row" layout="column">
 
-        <br>
+        <div flex-gt-sm="50" flex>
+            <div ng-repeat="section in sections track by $index">
+                <md-toolbar layout="row" class="sm-hue-3">
+                    <div class="sm-toolbar-tools">
+                        <span>{{section.topic}}</span>
+                    </div>
+                </md-toolbar>
+                <md-content>
+                    <md-list flex>
+                        <md-list-item class="md-2-line" ng-repeat='item in section.news' ng-click="openNews(item.link, item.title)">
+                            <img ng-src="./img/christmas.png" class="md-avatar" alt="flower" />
+                            <div class="md-list-item-text" layout="column">
+                                <h3> {{ item.title }}</h3>
+                            </div>
 
+                        </md-list-item>
+
+                    </md-list>
+                </md-content>
+
+            </div>
+        </div>
     </div>
 
-    <script src="js/angular.js"></script>
+    <md-button class="md-fab md-fab-bottom-right docs-scroll-fab md-button scrolling" ng-click="scrollTop()" style="position:fixed !important;">Top</md-button>
+
+<!-- Angular Material requires Angular.js Libraries -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+
+  <!-- Angular Material Library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+    <!-- <script src="js/angular.js"></script> -->
     <script src="js/app/app.js"></script>
     <script src="js/app/controllers/MainController.js"></script>
 
