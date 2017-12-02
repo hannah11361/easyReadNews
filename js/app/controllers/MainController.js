@@ -4,7 +4,7 @@ $.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent
 newsData = data.contents;
 });
 
-app.controller('MainController', function($scope, $timeout) {
+app.controller('MainController', function($scope, $timeout, $mdDialog) {
 	$scope.name = 'hannah';
 
 	$timeout(function (){
@@ -18,9 +18,25 @@ app.controller('MainController', function($scope, $timeout) {
 
 		$scope.newsData = newsData;
 		$scope.sections = scrapeSections(newsData);
-	}, 1500);
+	}, 1000);
 
+	$scope.scrapeNews = function (link){
+		console.log(link);
+	
 
+		$mdDialog.show({
+	      controller: DialogController,
+	      templateUrl: 'news.html',
+	      parent: angular.element(document.body),
+	      clickOutsideToClose:true
+	    })
+	}
+
+	function DialogController($scope, $mdDialog) {
+	    $scope.hide = function() {
+	      $mdDialog.hide();
+	    };
+	}
 	
 });
 
@@ -60,7 +76,6 @@ function scrapeSections(rawData){
 				sections.push(scrapeNewsLink(x)); 
 			};
 	});
-	console.log(sections);
 	return sections;
 }
 
@@ -69,12 +84,12 @@ function scrapeNewsLink(rawData){
 	var topicLink = /\/news\/\w+\//g;
 	var news = [];
 	var newsLink = /news\/[0-9/]*\.html/g;
-	var newsTitle = /blank"[^/]*/g;
+	var newsTitle = /blank"[^li]*<\/li>/g;
 	var titles = rawData.match(newsTitle);
 	var links = rawData.match(newsLink);
 	for (i = 0; i < titles.length; i++){
 		news.push({"link": `http://backchina.com${links[i]}`,
-			"title": titles[i].substring(7,titles[i].length-1)});
+			"title": titles[i].substring(7,titles[i].length-9)});
 	}
 	return {"topic": rawData.match(topicName)[0].substring(8).slice(0,-1), 
 			"link": `http://backchina.com${rawData.match(topicLink)}`,
