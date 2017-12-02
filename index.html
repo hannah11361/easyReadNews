@@ -12,11 +12,12 @@
 
     <div ng-cloak layout-gt-sm="row" layout="column">
 
-        <div flex-gt-sm="50" flex>
-            <div ng-repeat="section in sections track by $index">
-                <md-toolbar layout="row" class="sm-hue-3">
-                    <div class="sm-toolbar-tools">
-                        <span>{{section.topic}}</span>
+        <div flex-gt-sm="50" flex >
+            <div ng-repeat="section in sections track by $index" >
+                <md-toolbar layout="row" class="sm-hue-3" 
+                md-colors="::{backgroundColor: 'pink-300'}">
+                    <div class="sm-toolbar-tools" >
+                        <span >{{section.topic}}</span>
                     </div>
                 </md-toolbar>
                 <md-content>

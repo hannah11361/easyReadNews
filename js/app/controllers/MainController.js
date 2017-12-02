@@ -42,11 +42,13 @@ app.controller('MainController', function($scope, $timeout, $mdDialog) {
 
 	    $scope.newsLink = link;
 	    $scope.newsTitle = title;
-	    $scope.news = ["loading awesomeness ... "],["thanks for waiting!!!"];
+	    $scope.news = ["loading awesomeness ... "];
 
 		$timeout(function (){
 			$scope.news = scrapePage(contents);
 		}, 1000);
+
+
 	}
 	
 });
@@ -78,10 +80,10 @@ function scrapeNewsLinks(rawData){
 	var links = rawData.match(newsLink);
 	for (i = 0; i < titles.length; i++){
 		news.push({"link": `http://backchina.com/${links[i]}`,
-			"title": titles[i].substring(7,titles[i].length-9)});
+			"title": titles[i].slice(7,-9)});
 	}
 
-	return {"topic": rawData.match(topicName)[0].substring(8).slice(0,-1), 
+	return {"topic": rawData.match(topicName)[0].slice(8,-1), 
 			"link": `http://backchina.com${rawData.match(topicLink)}`,
 			"news": news
 			};
@@ -89,28 +91,28 @@ function scrapeNewsLinks(rawData){
 }
 
 function scrapePage(rawData){
-	var sourceExp = />来源[^/]*/g; //.slice(0,-1);
-	var source = rawData.match(sourceExp)[0].slice(1,-1);
-	
+	var sourceExp = /<\/span>\n来源[^s]*/g; //.slice(0,-1);
+	var source = rawData.match(sourceExp)[0].slice(7,-1);
+
 	var mainExp =  /main_content([\s\S]*?)specialnews">/g;
 	 //each array content
 	var newsExp = /<p([\s\S]*?)<\/p>/g;
 	var news = rawData.match(mainExp)[0].match(newsExp);
 	//clean up data
+	
 	for (i=0; i < news.length; i++){
-		news[i] = news[i].replace(/<(?:.|\n)*?>/g, '').trim();
+		news[i] = cleanHTML(news[i]);
 	}
 
+	console.log("here");
+	console.log(rawData);
+	
 	return {
 		"source": source,
 		"content": news
 	};
 }
 
-function cleanHTML(data){
-	for (i=0; i < data.length; i++){
-		data[i].replace(/<(?:.|\n)*?>/gm, '').trim();
-	}
-	
+function cleanHTML(str){
+	return str.replace(/<(?:.|\n)*?>/gm, '').trim();
 }
-//myString.replace(/<(?:.|\n)*?>/gm, '');
