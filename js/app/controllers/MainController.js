@@ -1,33 +1,39 @@
-	var newsData = "";
-	$.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent('http://www.backchina.com/news')) + '&callback=?', function(data){
-	// newsData = decodeURIComponent(escape(data.contents));
-	newsData = data.contents;
-	});
-	
-
-	var ul = /<ul class="cl">/g;
-	//  [\u2E80-\u2FD5\u3400-\u4DBF\u4E00-\u9FCC]{4}<\/a><\/li>
+var newsData = "";
+$.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent('http://www.backchina.com/news')) + '&callback=?', function(data){
+// newsData = decodeURIComponent(escape(data.contents));
+newsData = data.contents;
+});
 
 app.controller('MainController', function($scope, $timeout) {
 	$scope.name = 'hannah';
+
 	$timeout(function (){
+      $scope.trans = true;
+
+      $scope.demo = {
+        isOpen: true,
+        count: 0,
+        selectedDirection: 'right'
+      };
+
 		$scope.newsData = newsData;
-		$scope.topics = scrapeTopics(newsData);
-	}, 1000);
+		$scope.sections = scrapeSections(newsData);
+	}, 1500);
+
+
 	
 });
 
 function scrapeMainPage(){
-	var newsData = "";
+	let data = "";
 	$.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent('http://www.backchina.com')) + '&callback=?', function(data){
-	// newsData = decodeURIComponent(escape(data.contents));
-	newsData = data.contents;
+	
+	data = data.contents;
 	});
-	console.log(newsData);
 	return newsData;
 }
 
-function scrapeTopics (rawData){
+function scrapeTopics(rawData){
 	var exp = /\><a href="\/news\/\w+\/">[\u2E80-\u2FD5\u3400-\u4DBF\u4E00-\u9FCC]{4}/g;
 	var topics = [];
 
@@ -37,6 +43,42 @@ function scrapeTopics (rawData){
 				"chnTopic": x.substring(x.length-4)}
 			topics.push(topic);
 	});
-
 	return topics;
+}
+
+/*
+	[
+		{topic: xxx, link: xxx, news: [{link: xxx, title: xxx}, ...] },
+	 ...]
+*/
+function scrapeSections(rawData){
+	var exp = /<div class="hot_topic">\n*.*<a hre.*\n*.*\n*.*/g;
+	var sections = [];
+
+	rawData.match(exp).forEach(function(x, idx) {
+			if (idx !== 1){
+				sections.push(scrapeNewsLink(x)); 
+			};
+	});
+	console.log(sections);
+	return sections;
+}
+
+function scrapeNewsLink(rawData){
+	var topicName = /<strong>[^<]*</g;
+	var topicLink = /\/news\/\w+\//g;
+	var news = [];
+	var newsLink = /news\/[0-9/]*\.html/g;
+	var newsTitle = /blank"[^/]*/g;
+	var titles = rawData.match(newsTitle);
+	var links = rawData.match(newsLink);
+	for (i = 0; i < titles.length; i++){
+		news.push({"link": `http://backchina.com${links[i]}`,
+			"title": titles[i].substring(7,titles[i].length-1)});
+	}
+	return {"topic": rawData.match(topicName)[0].substring(8).slice(0,-1), 
+			"link": `http://backchina.com${rawData.match(topicLink)}`,
+			"news": news
+			};
+
 }
