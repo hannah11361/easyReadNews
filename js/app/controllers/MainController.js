@@ -1,31 +1,19 @@
 var newsData = "";
 var testData = "";
+
 $.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent('http://www.backchina.com/news')) + '&callback=?', function(data){
 	newsData = data.contents;
-});
-
-
-$.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent('http://backchina.com/news/2017/12/03/530637.html')) + '&callback=?', function(data){
-	testData = data.contents;
 });
 
 app.controller('MainController', function($scope, $timeout, $mdDialog) {
 	$scope.name = 'hannah';
 
 	$timeout(function (){
-      $scope.trans = true;
-
-      $scope.demo = {
-        isOpen: true,
-        count: 0,
-        selectedDirection: 'right'
-      };
-
 		$scope.newsData = newsData;
 		$scope.sections = scrapeSections(newsData);
 	}, 1000);
 
-	$scope.scrapeNews = function (link, title){
+	$scope.openNews = function (link, title){
 		
 		$mdDialog.show({
 		  locals:{link: link, title: title},
@@ -33,7 +21,8 @@ app.controller('MainController', function($scope, $timeout, $mdDialog) {
           controllerAs: 'dialogCtrl',
 	      templateUrl: 'news.html',
 	      parent: angular.element(document.body),
-	      clickOutsideToClose:true
+	      clickOutsideToClose:true,
+	      fullscreen: true
 	    });
 	}
 
@@ -42,9 +31,9 @@ app.controller('MainController', function($scope, $timeout, $mdDialog) {
 	}
 
 	function DialogController($scope, $mdDialog, $timeout, link, title) {
-		var content = "";
+		var contents = "";
 		$.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent(link)) + '&callback=?', function(data){
-			content = data.contents;
+			contents = data.contents;
 		});
 
 	    $scope.cancel = function() {
@@ -53,10 +42,10 @@ app.controller('MainController', function($scope, $timeout, $mdDialog) {
 
 	    $scope.newsLink = link;
 	    $scope.newsTitle = title;
-	    $scope.content = "loading awesomeness ... ";
+	    $scope.news = ["loading awesomeness ... "],["thanks for waiting!!!"];
 
 		$timeout(function (){
-			$scope.content = content;
+			$scope.news = scrapePage(contents);
 		}, 1000);
 	}
 	
@@ -73,13 +62,13 @@ function scrapeSections(rawData){
 
 	rawData.match(exp).forEach(function(x, idx) {
 			if (idx !== 1){
-				sections.push(scrapeNewsLink(x)); 
+				sections.push(scrapeNewsLinks(x)); 
 			};
 	});
 	return sections;
 }
 
-function scrapeNewsLink(rawData){
+function scrapeNewsLinks(rawData){
 	var topicName = /<strong>[^<]*</g;
 	var topicLink = /\/news\/\w+\//g;
 	var news = [];
@@ -96,4 +85,21 @@ function scrapeNewsLink(rawData){
 			"news": news
 			};
 
+}
+
+function scrapePage(rawData){
+	var sourceExp = />来源[^/]*/g; //.slice(0,-1);
+	var source = rawData.match(sourceExp)[0].slice(1,-1);
+	
+	var mainExp =  /main_content([\s\S]*?)specialnews">/g;
+//each array content
+	var newsExp = /<p([\s\S]*?)<\/p>/g;
+	var news = rawData.match(mainExp)[0].match(newsExp);
+
+	testData = rawData;
+
+	return {
+		"source": source,
+		"content": news
+	};
 }

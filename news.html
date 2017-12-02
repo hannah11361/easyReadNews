@@ -2,7 +2,7 @@
   <form ng-cloak>
     <md-toolbar>
       <div class="md-toolbar-tools">
-        <h2>{{newsTitle}} {{ newsLink }} </h2>
+        <h2>{{newsTitle}}</h2>
         <span flex></span>
         <md-button class="md-icon-button" ng-click="cancel()">
           X
@@ -12,8 +12,8 @@
 
     <md-dialog-content>
       <div class="md-dialog-content">
-
-        <h2>{{ content }}</h2>
+        <p> {{news.source}}</p>
+        <p  ng-repeat="content in news.content track by $index">{{ content }}</p>
 
       </div>
     </md-dialog-content>
