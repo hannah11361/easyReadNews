@@ -80,6 +80,7 @@ function scrapeNewsLinks(rawData){
 		news.push({"link": `http://backchina.com/${links[i]}`,
 			"title": titles[i].substring(7,titles[i].length-9)});
 	}
+
 	return {"topic": rawData.match(topicName)[0].substring(8).slice(0,-1), 
 			"link": `http://backchina.com${rawData.match(topicLink)}`,
 			"news": news
@@ -95,11 +96,24 @@ function scrapePage(rawData){
 //each array content
 	var newsExp = /<p([\s\S]*?)<\/p>/g;
 	var news = rawData.match(mainExp)[0].match(newsExp);
-
-	testData = rawData;
+	
+	for (i=0; i < news.length; i++){
+		news[i] = news[i].replace(/<(?:.|\n)*?>/g, '').trim();
+		console.log(news[i]);
+	}
+	
+	console.log(news);
 
 	return {
 		"source": source,
 		"content": news
 	};
 }
+
+function cleanHTML(data){
+	for (i=0; i < data.length; i++){
+		data[i].replace(/<(?:.|\n)*?>/gm, '').trim();
+	}
+	
+}
+//myString.replace(/<(?:.|\n)*?>/gm, '');
