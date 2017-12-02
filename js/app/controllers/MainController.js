@@ -93,16 +93,13 @@ function scrapePage(rawData){
 	var source = rawData.match(sourceExp)[0].slice(1,-1);
 	
 	var mainExp =  /main_content([\s\S]*?)specialnews">/g;
-//each array content
+	 //each array content
 	var newsExp = /<p([\s\S]*?)<\/p>/g;
 	var news = rawData.match(mainExp)[0].match(newsExp);
-	
+	//clean up data
 	for (i=0; i < news.length; i++){
 		news[i] = news[i].replace(/<(?:.|\n)*?>/g, '').trim();
-		console.log(news[i]);
 	}
-	
-	console.log(news);
 
 	return {
 		"source": source,

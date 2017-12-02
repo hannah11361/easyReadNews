@@ -9,10 +9,10 @@
         </md-button>
       </div>
     </md-toolbar>
-
     <md-dialog-content>
       <div class="md-dialog-content">
-        <p>{{news.source}}</p>
+        <a href={{newsLink}} target="_blank">{{news.source}}</a>
+      
         <div ng-repeat="content in news.content track by $index">
           <p>{{ content }}</p>
           <p></p>
