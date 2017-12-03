@@ -9,7 +9,6 @@ app.controller('MainController', function($scope, $timeout, $mdDialog, $interval
 	$scope.name = 'hannah';
 
 	$timeout(function (){
-		$scope.newsData = newsData;
 		$scope.sections = scrapeSections(newsData);
 	}, 1000);
 
@@ -71,7 +70,7 @@ function scrapeSections(rawData){
 	var sections = [];
 
 	rawData.match(exp).forEach(function(x, idx) {
-			if (idx !== 1){
+			if (idx !== 1 && idx !== 3){
 				sections.push(scrapeNewsLinks(x)); 
 			};
 	});
@@ -88,7 +87,7 @@ function scrapeNewsLinks(rawData){
 	var links = rawData.match(newsLink);
 	for (i = 0; i < titles.length; i++){
 		news.push({"link": `http://backchina.com/${links[i]}`,
-			"title": titles[i].slice(7,-9)});
+			"title": titles[i].slice(7,-9).replace(/&quot;/g,'"')});
 	}
 
 	return {"topic": rawData.match(topicName)[0].slice(8,-1), 
@@ -125,6 +124,6 @@ function cleanHTML(str){
 	if (str.includes("<img src")){
 		return {"isImage": str.match(/src=([\s\S]*?)border/g)[0].slice(5,-8)};
 	} else {
-		return str.replace(/<(?:.|\n)*?>/gm, '').trim();
+		return str.replace(/<(?:.|\n)*?>/gm, '').trim().replace(/&quot;/g,'"');
 	}
 }
