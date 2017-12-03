@@ -16,9 +16,9 @@
             <i class="material-icons">home</i>
         </md-button>
         <md-content layout-padding ng-show="showMenu">
-            <button ng-repeat="section in sections" class="md-fab md-mini md-primary" >
-                    <a href="#{{section.topic}}">{{ section.topic }}</a>
-            </button>
+            <md-button ng-repeat="section in sections" class="md-primary md-accent md-mini" ng-href="#{{section.topic}}">
+            {{ section.topic }}
+            </md-button>
         </md-content>
     </div>
 

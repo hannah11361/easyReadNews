@@ -27,12 +27,14 @@ app.controller('MainController', function($scope, $timeout, $mdDialog, $interval
 	}
 
 	$scope.scrollTop = function(){
-		$("html, body").animate({ scrollTop: 0 }, 1000);
+		$("html, body").animate({ scrollTop: 0 }, 500);
 	}
 
 	$scope.showMenu = false;
 	$scope.clickHome = function(){
+		$scope.scrollTop();
 		$scope.showMenu = !$scope.showMenu;
+
 	}
 	$interval(function(){
 		$scope.showMenu = false;
