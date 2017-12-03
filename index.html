@@ -6,26 +6,38 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
     <title>Easy Read</title>
 </head>
 <body ng-app="myApp" ng-controller="MainController">
+    <div ng-cloak>
+        <md-button aria-label="menu" class="md-fab md-mini md-fab-top-right md-warn" ng-click="clickHome()" style="position:fixed !important;">
+            <i class="material-icons">home</i>
+        </md-button>
+        <md-content layout-padding ng-show="showMenu">
+            <button ng-repeat="section in sections" class="md-fab md-mini md-primary" >
+                    <a href="#{{section.topic}}">{{ section.topic }}</a>
+            </button>
+        </md-content>
+    </div>
 
     <div ng-cloak layout-gt-sm="row" layout="column">
 
         <div flex-gt-sm="50" flex >
             <div ng-repeat="section in sections track by $index" >
                 <md-toolbar layout="row" class="sm-hue-3" 
-                md-colors="::{backgroundColor: 'pink-300'}">
+                md-colors="::{backgroundColor: 'purple-300'}">
                     <div class="sm-toolbar-tools" >
-                        <span >{{section.topic}}</span>
+                        <a name="{{section.topic}}"><span >{{section.topic}}</span></a>
                     </div>
                 </md-toolbar>
                 <md-content>
-                    <md-list flex>
-                        <md-list-item class="md-2-line" ng-repeat='item in section.news' ng-click="openNews(item.link, item.title)">
+                    <md-list flex layout-fill>
+                        <md-list-item class="md-2-line md-long-text" ng-repeat='item in section.news' ng-click="openNews(item.link, item.title)">
                             <img ng-src="./img/christmas.png" class="md-avatar" alt="flower" />
-                            <div class="md-list-item-text" layout="column">
-                                <h3> {{ item.title }}</h3>
+                            <div class="md-list-item-text" layout="column" layout-wrap>
+                                <p> {{ item.title }}</p>
                             </div>
 
                         </md-list-item>
@@ -37,7 +49,7 @@
         </div>
     </div>
 
-    <md-button class="md-fab md-fab-bottom-right docs-scroll-fab md-button scrolling" ng-click="scrollTop()" style="position:fixed !important;">Top</md-button>
+    <md-button class="md-fab md-mini md-fab-bottom-right docs-scroll-fab md-button scrolling" ng-click="scrollTop()" style="position:fixed !important;">Top</md-button>
 
 <!-- Angular Material requires Angular.js Libraries -->
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>

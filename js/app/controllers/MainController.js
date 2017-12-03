@@ -5,7 +5,7 @@ $.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent
 	newsData = data.contents;
 });
 
-app.controller('MainController', function($scope, $timeout, $mdDialog) {
+app.controller('MainController', function($scope, $timeout, $mdDialog, $interval) {
 	$scope.name = 'hannah';
 
 	$timeout(function (){
@@ -30,6 +30,14 @@ app.controller('MainController', function($scope, $timeout, $mdDialog) {
 		$("html, body").animate({ scrollTop: 0 }, 1000);
 	}
 
+	$scope.showMenu = false;
+	$scope.clickHome = function(){
+		$scope.showMenu = !$scope.showMenu;
+	}
+	$interval(function(){
+		$scope.showMenu = false;
+	}, 5000);
+
 	function DialogController($scope, $mdDialog, $timeout, link, title) {
 		var contents = "";
 		$.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent(link)) + '&callback=?', function(data){
@@ -47,8 +55,6 @@ app.controller('MainController', function($scope, $timeout, $mdDialog) {
 		$timeout(function (){
 			$scope.news = scrapePage(contents);
 		}, 1000);
-
-
 	}
 	
 });
