@@ -96,16 +96,16 @@ function scrapePage(rawData){
 
 	var mainExp =  /main_content([\s\S]*?)specialnews">/g;
 	 //each array content
+	var picWordExp = /<div style="text-align: center;"><img([\s\S]*?)border="0">|<p([\s\S]*?)<\/p>/g;
 	var newsExp = /<p([\s\S]*?)<\/p>/g;
-	var news = rawData.match(mainExp)[0].match(newsExp);
+	var news = rawData.match(mainExp)[0].match(picWordExp);
+
+
 	//clean up data
 	
 	for (i=0; i < news.length; i++){
 		news[i] = cleanHTML(news[i]);
 	}
-
-	console.log("here");
-	console.log(rawData);
 	
 	return {
 		"source": source,
@@ -114,5 +114,9 @@ function scrapePage(rawData){
 }
 
 function cleanHTML(str){
-	return str.replace(/<(?:.|\n)*?>/gm, '').trim();
+	if (str.includes("<img src")){
+		return {"isImage": str.match(/src=([\s\S]*?)border/g)[0].slice(5,-8)};
+	} else {
+		return str.replace(/<(?:.|\n)*?>/gm, '').trim();
+	}
 }

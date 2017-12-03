@@ -12,10 +12,15 @@
     <md-dialog-content>
       <div class="md-dialog-content">
         <a href={{newsLink}} target="_blank">{{news.source}}</a>
-      
+        
         <div ng-repeat="content in news.content track by $index">
-          <p>{{ content }}</p>
-          <p></p>
+          <div ng-if="content.isImage">
+            <img style="margin: auto; max-width: 100%;" alt="image failed" ng-src="{{ content.isImage }}" />
+          </div>
+          <div ng-show="!content.isImage">
+            <p>{{ content }}</p>
+            <p></p>
+          </div>
         </div>
 
       </div>
