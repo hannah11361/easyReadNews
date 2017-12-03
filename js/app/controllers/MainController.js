@@ -32,7 +32,7 @@ app.controller('MainController', function($scope, $timeout, $mdDialog, $interval
 
 	$scope.showMenu = false;
 	$scope.clickHome = function(){
-		$scope.scrollTop();
+		$("html, body").animate({ scrollTop: 0 }, 500);
 		$scope.showMenu = !$scope.showMenu;
 
 	}
