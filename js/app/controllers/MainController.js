@@ -6,10 +6,15 @@ $.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent
 });
 
 app.controller('MainController', function($scope, $timeout, $mdDialog, $interval) {
-	$scope.name = 'hannah';
-
 	$timeout(function (){
-		$scope.sections = scrapeSections(newsData);
+		var mainNewsExp = /waterfall([\s\S]*?)listloopbottom/g;
+		// var mainNews = newsData.match(mainNewsExp);
+		var mainNews = scrapeNewsLinks(newsData.match(mainNewsExp)[0], true);
+		
+
+		// $scope.sections = scrapeSections(newsData);
+		// $scope.sections[1] = mainNews;
+		$scope.sections = [mainNews];
 	}, 1000);
 
 	$scope.openNews = function (link, title){
@@ -39,7 +44,7 @@ app.controller('MainController', function($scope, $timeout, $mdDialog, $interval
 		$scope.showMenu = false;
 	}, 5000);
 
-	function DialogController($scope, $mdDialog, $timeout, link, title) {
+	function DialogController($scope, $mdDialog, $timeout, $interval, link, title) {
 		var contents = "";
 		$.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent(link)) + '&callback=?', function(data){
 			contents = data.contents;
@@ -51,11 +56,18 @@ app.controller('MainController', function($scope, $timeout, $mdDialog, $interval
 
 	    $scope.newsLink = link;
 	    $scope.newsTitle = title;
-	    $scope.news = ["loading awesomeness ... "];
+	    // $scope.news = ["loading awesomeness ... "];
 
 		$timeout(function (){
 			$scope.news = scrapePage(contents);
 		}, 1000);
+
+		$interval(function(){
+			if (!$scope.news){
+				console.log("here scraping again");
+				$scope.news = scrapePage(contents);
+			}
+		}, 100);
 	}
 	
 });
@@ -63,7 +75,7 @@ app.controller('MainController', function($scope, $timeout, $mdDialog, $interval
 /* main page news titles, link json setup:
 	[
 		{topic: xxx, link: xxx, news: [{link: xxx, title: xxx}, ...] },
-	 ...]
+	 ...]  151 news; 164 title
 */
 function scrapeSections(rawData){
 	var exp = /<div class="hot_topic">\n*.*<a hre.*\n*.*\n*.*/g;
@@ -71,30 +83,45 @@ function scrapeSections(rawData){
 
 	rawData.match(exp).forEach(function(x, idx) {
 			if (idx !== 1 && idx !== 3){
-				sections.push(scrapeNewsLinks(x)); 
+				sections.push(scrapeNewsLinks(x, false)); 
 			};
 	});
 	return sections;
 }
 
-function scrapeNewsLinks(rawData){
+//if scraping for main is true, return topic as main, link as main page
+function scrapeNewsLinks(rawData, main){
 	var topicName = /<strong>[^<]*</g;
 	var topicLink = /\/news\/\w+\//g;
+
+	var newsLinkTitle = /href([\s\S]*?)\<\/a>/g;
 	var news = [];
+
 	var newsLink = /news\/[0-9/]*\.html/g;
-	var newsTitle = /blank"[^li]*<\/li>/g;
-	var titles = rawData.match(newsTitle);
+	// to not include discussions in the link
+	var newsTitle = /blank"[^li]*<\/a>/g; 
+	var cutOff = main ? -10 : -9;
+	var rawNews = rawData.match(newsLinkTitle);
 	var links = rawData.match(newsLink);
-	for (i = 0; i < titles.length; i++){
-		news.push({"link": `http://backchina.com/${links[i]}`,
-			"title": titles[i].slice(7,-9).replace(/&quot;/g,'"')});
+	for (i = 0; i < rawNews.length; i++){
+		if(rawNews[i].includes('href="/news'))
+		{	
+			news.push({"link": `http://backchina.com/${rawNews[i].match(newsLink)[0]}`,
+			"title": rawNews[i].match(newsTitle)[0].slice(7,-4).replace(/&quot;/g,'"')});
+		}
 	}
 
-	return {"topic": rawData.match(topicName)[0].slice(8,-1), 
-			"link": `http://backchina.com${rawData.match(topicLink)}`,
-			"news": news
-			};
-
+	if(main){
+		return {"topic": "滚动直播", 
+		"link": 'http://backchina.com／news',
+		"news": news
+		};
+	} else {
+		return {"topic": rawData.match(topicName)[0].slice(8,-1), 
+				"link": `http://backchina.com${rawData.match(topicLink)}`,
+				"news": news
+				};
+	}
 }
 
 function scrapePage(rawData){
@@ -125,5 +152,6 @@ function cleanHTML(str){
 		return {"isImage": str.match(/src=([\s\S]*?)border/g)[0].slice(5,-8)};
 	} else {
 		return str.replace(/<(?:.|\n)*?>/gm, '').trim().replace(/&quot;/g,'"');
+		
 	}
 }
