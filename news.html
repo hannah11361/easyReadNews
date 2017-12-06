@@ -7,7 +7,7 @@
     </md-toolbar>
     <md-dialog-content>
       <div class="md-dialog-content">
-        <a href={{newsLink}} target="_blank">{{news.source}}</a>
+        <a href={{newsLink}} target="_blank">{{news.source}} {{ news.timeStamp }}</a>
         
         <div ng-repeat="content in news.content track by $index">
           <div ng-if="content.isImage">
