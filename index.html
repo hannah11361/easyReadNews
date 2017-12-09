@@ -35,8 +35,8 @@
                 <md-content>
                     <md-list flex layout-fill>
                         <md-list-item class="md-2-line md-long-text" ng-repeat='item in section.news' ng-click="openNews(item.link, item.title)">
-                            <img ng-src="./img/christmas.png" class="md-avatar" alt="flower" />
-                            <div class="md-list-item-text" layout="column" layout-wrap>
+                            <img ng-src ={{item.pic}} src="./img/christmas.png" flex=25 alt="flower" />
+                            <div class="md-list-item-text" layout="column" layout-wrap flex=75>
                                 <p> {{ item.title }}</p>
                             </div>
 

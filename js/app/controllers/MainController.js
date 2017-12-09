@@ -1,8 +1,12 @@
 var newsData = "";
-var testData = "";
+var picsData = "";
 
 $.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent('http://www.backchina.com/news')) + '&callback=?', function(data){
 	newsData = data.contents;
+});
+
+$.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent('http://www.backchina.com/news/picture/index.php?page=1')) + '&callback=?', function(data){
+	picsData = data.contents;
 });
 
 app.controller('MainController', function($scope, $timeout, $mdDialog, $interval) {
@@ -10,9 +14,20 @@ app.controller('MainController', function($scope, $timeout, $mdDialog, $interval
 		var mainNewsExp = /waterfall([\s\S]*?)listloopbottom/g;
 		var mainNews = newsData.match(mainNewsExp);
 		var sNews = scrapeNewsLinks(mainNews[0]);
+		$scope.sections = []; //array to prepare for future expansion to multiple sections
 
-		// $scope.sections = scrapeSections(newsData);
-		$scope.sections = [sNews];
+		var picNewsExp = /<ul class="bkpicnews">([\s\S]*?)<\/ul>/g;
+		var picNews = picsData.match(picNewsExp);
+		var pNews = scrapePicPage(picNews[0]);
+
+		// var n = $scopes.sections[0].news.length;
+		// for (i = 0; i < n; i ++){
+		// 	if (pNews.find($scope.section[0].news[i].link == )
+		// }
+	
+		$scope.sections.push(pNews);
+		$scope.sections.push(sNews)
+
 	}, 1000);
 
 	$scope.openNews = function (link, title){
@@ -48,6 +63,7 @@ app.controller('MainController', function($scope, $timeout, $mdDialog, $interval
 			contents = data.contents;
 		});
 
+		$scope.news = "";
 	    $scope.cancel = function() {
 	      $mdDialog.cancel();
 	    };
@@ -59,15 +75,12 @@ app.controller('MainController', function($scope, $timeout, $mdDialog, $interval
 		$timeout(function (){
 			$scope.news = scrapePage(contents);
 			$interval(function(){
-				if (!$scope.news){
+				if ($scope.news == ""){
 					$scope.news = scrapePage(contents);
 				}
 			}, 100);
 		}, 1000);
-
-
-	}
-	
+	}	
 });
 
 /* main page news titles, link json setup:
@@ -98,12 +111,10 @@ function scrapeSections(rawData){
 
 //if scraping for main is true, return topic as main, link as main page
 function scrapeNewsLinks(rawData){
-
 	var newsLinkTitle = /href([\s\S]*?)\<\/a>/g;
 	var news = [];
 	var newsLink = /news\/[0-9/]*\.html/g;
 	var newsTitle = /blank"([\s\S]*?)\<\/a>/g; 
-	
 	var rawNews = rawData.match(newsLinkTitle);
 	
 	for (i = 0; i < rawNews.length; i++){
@@ -113,10 +124,27 @@ function scrapeNewsLinks(rawData){
 			let title = rawNews[i].match(newsTitle)[0].slice(7,-4).replace(/&quot;/g,'"');
 			news.push({"link": 'http://backchina.com/'+link, "title": title});
 		}
+	}	
+	return {"topic": "滚动直播", "link": 'http://backchina.com／news', "news": news};
+}
+
+function scrapePicPage(rawData){
+	var linksExp = /<img([\s\S]*?)<\/p>/g;
+	var newsLink = /news\/[0-9/]*\.html/g;
+	var picLink = /src="([\s\S]*?)"/g;
+	var titleExp = /_blank">([\s\S]*?)<\/a>/g;
+	var picsInfo = rawData.match(linksExp);
+	var news = [];
+
+	for (i = 0; i < picsInfo.length; i++){
+		let link = 'http://backchina.com/' + picsInfo[i].match(newsLink)[0];
+		let pic = picsInfo[i].match(picLink)[0].slice(5, -1);
+		let title = picsInfo[i].match(titleExp)[0].slice(8, -4).replace(/&quot;/g,'"');
+
+		news.push({"link": link, "title": title, "pic": pic});
 	}
 
-	
-		return {"topic": "滚动直播", "link": 'http://backchina.com／news', "news": news};
+	return {"topic": "图片新闻", "link": "http://www.backchina.com/news/picture/", "news": news};
 }
 
 function scrapePage(rawData){
@@ -145,6 +173,7 @@ function scrapePage(rawData){
 	};
 }
 
+
 function cleanHTML(str){
 	if (str.includes("<img src")){
 		return {"isImage": str.match(/src=([\s\S]*?)border/g)[0].slice(5,-8)};
@@ -153,3 +182,5 @@ function cleanHTML(str){
 		
 	}
 }
+
+
