@@ -21,7 +21,9 @@
             </md-button>
         </md-content>
     </div>
-
+    <div layout="row" layout-sm="column" layout-align="space-around">
+        <md-progress-circular md-mode="indeterminate" class="md-accent md-hue-1" md-diameter="60" ng-if="mainPageLoading"></md-progress-circular>
+    </div>
     <div ng-cloak layout-gt-sm="row" layout="column">
 
         <div flex-gt-sm="50" flex >

@@ -1,34 +1,41 @@
-var newsData = "";
-var picsData = "";
-
-$.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent('http://www.backchina.com/news')) + '&callback=?', function(data){
-	newsData = data.contents;
-});
-
-$.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent('http://www.backchina.com/news/picture/index.php?page=1')) + '&callback=?', function(data){
-	picsData = data.contents;
-});
-
 app.controller('MainController', function($scope, $timeout, $mdDialog, $interval) {
-	$timeout(function (){
+	var newsData = "";
+	var picsData = "";	
+	$scope.mainPageLoading = true;
+	$scope.sections = []; //array to prepare for future expansion to multiple sections
+	
+	$.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent('http://www.backchina.com/news')) + '&callback=?', function(data){
+		$scope.mainPageLoading = false;
+		newsData = data.contents;
 		var mainNewsExp = /waterfall([\s\S]*?)listloopbottom/g;
 		var mainNews = newsData.match(mainNewsExp);
 		var sNews = scrapeNewsLinks(mainNews[0]);
-		$scope.sections = []; //array to prepare for future expansion to multiple sections
-
-		var picNewsExp = /<ul class="bkpicnews">([\s\S]*?)<\/ul>/g;
-		var picNews = picsData.match(picNewsExp);
-		var pNews = scrapePicPage(picNews[0]);
-
-		// var n = $scopes.sections[0].news.length;
-		// for (i = 0; i < n; i ++){
-		// 	if (pNews.find($scope.section[0].news[i].link == )
-		// }
-	
-		$scope.sections.push(pNews);
 		$scope.sections.push(sNews)
+	});
 
-	}, 1000);
+	// $.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent('http://www.backchina.com/news/picture/index.php?page=1')) + '&callback=?', function(data){
+	// 	picsData = data.contents;
+	// 	var picNewsExp = /<ul class="bkpicnews">([\s\S]*?)<\/ul>/g;
+	// 	var picNews = picsData.match(picNewsExp);
+	// 	var pNews = scrapePicPage(picNews[0]);
+	// });
+
+	// $timeout(function (){
+
+	// 	var mainNewsExp = /waterfall([\s\S]*?)listloopbottom/g;
+	// 	var mainNews = newsData.match(mainNewsExp);
+	// 	var sNews = scrapeNewsLinks(mainNews[0]);
+
+
+
+	// 	var picNewsExp = /<ul class="bkpicnews">([\s\S]*?)<\/ul>/g;
+	// 	var picNews = picsData.match(picNewsExp);
+	// 	var pNews = scrapePicPage(picNews[0]);
+
+	// 	$scope.sections.push(pNews);
+	// 	$scope.sections.push(sNews)
+
+	// }, 1000);
 
 	$scope.openNews = function (link, title){
 		
@@ -58,28 +65,29 @@ app.controller('MainController', function($scope, $timeout, $mdDialog, $interval
 	}, 5000);
 
 	function DialogController($scope, $mdDialog, $timeout, $interval, link, title) {
+		$scope.loading = true;
 		var contents = "";
-		$.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent(link)) + '&callback=?', function(data){
-			contents = data.contents;
-		});
-
-		$scope.news = "";
 	    $scope.cancel = function() {
 	      $mdDialog.cancel();
 	    };
 
 	    $scope.newsLink = link;
 	    $scope.newsTitle = title;
-	    // $scope.news = ["loading awesomeness ... "];
 
-		$timeout(function (){
+	    $.getJSON('http://www.whateverorigin.org/get?url=' + unescape(encodeURIComponent(link)) + '&callback=?', function(data){
+			$scope.loading = false;
+			contents = data.contents;
 			$scope.news = scrapePage(contents);
-			$interval(function(){
-				if ($scope.news == ""){
-					$scope.news = scrapePage(contents);
-				}
-			}, 100);
-		}, 1000);
+		});
+
+		// $timeout(function (){
+		// 	$scope.news = scrapePage(contents);
+		// 	$interval(function(){
+		// 		if ($scope.news == ""){
+		// 			$scope.news = scrapePage(contents);
+		// 		}
+		// 	}, 100);
+		// }, 1000);
 	}	
 });
 
