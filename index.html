@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
-    <title>Easy Read</title>
+    <title>易读 Easy Read</title>
 </head>
 <body ng-app="myApp" ng-controller="MainController">
     <div ng-cloak>
@@ -37,7 +37,7 @@
                 <md-content>
                     <md-list flex layout-fill>
                         <md-list-item class="md-2-line md-long-text" ng-repeat='item in section.news' ng-click="openNews(item.link, item.title)">
-                            <img ng-src ={{item.pic}} src="./img/christmas.png" flex=25 alt="flower" />
+                            <img ng-src ={{item.pic}} src="./img/default.jpg" flex=25 alt="flower" />
                             <div class="md-list-item-text" layout="column" layout-wrap flex=75>
                                 <p> {{ item.title }}</p>
                             </div>
@@ -61,7 +61,6 @@
 
   <!-- Angular Material Library -->
   <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
-    <!-- <script src="js/angular.js"></script> -->
     <script src="js/app/app.js"></script>
     <script src="js/app/controllers/MainController.js"></script>
 
